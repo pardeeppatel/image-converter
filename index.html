@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Converter - Convert & Smart Compress JPG, PNG, WebP</title>
+    <meta name="description" content="Free online image converter tool to convert JPG to PNG, PNG to JPG, WebP to JPG, WebP to PNG, and more. Automatically optimizes image size for web without visible quality loss by intelligent resizing and compression. Supports multiple images. Fast, easy, and mobile-friendly.">
+    <meta name="keywords" content="image converter, convert image, JPG to PNG, PNG to JPG, WebP to JPG, WebP to PNG, image compressor, compress image, reduce image size, free image tool, online image converter, quality image optimization, multiple images, batch image converter">
+    <meta name="author" content="myscrpts.com">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://image-converter.myscrpts.com/">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9704521076577901"
+            crossorigin="anonymous"></script>
+    <style>
+        /* Apply border-box globally for consistent sizing */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        /* Custom styles for better aesthetics and responsiveness */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            display: flex;
+            flex-direction: column; /* Arrange header, main, footer vertically */
+            justify-content: space-between; /* Push header/footer to ends */
+            min-height: 100vh;
+            padding: 0; /* Remove body padding as header/footer will handle spacing */
+            margin: 0; /* Remove default body margin */
+            overflow-x: hidden; /* Prevent horizontal scrolling */
+        }
+
+        /* Main content area styling */
+        .main-content-wrapper {
+            flex-grow: 1; /* Allows main content to take available space */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem; /* Padding around the main container */
+        }
+
+        .container {
+            max-width: 500px; /* Explicit max width */
+            width: 100%; /* Take full available width up to max-width */
+            background-color: #ffffff;
+            padding: 2.5rem;
+            border-radius: 1.5rem; /* More rounded corners */
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); /* Deeper shadow */
+            text-align: center;
+            margin-left: auto; /* Center the container */
+            margin-right: auto; /* Center the container */
+        }
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%; /* Full width for the input area */
+        }
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+        .file-input-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 1.5rem;
+            background-color: #4f46e5; /* Indigo */
+            color: white;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-weight: 600;
+            border: 2px solid #4f46e5;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+        .file-input-button:hover {
+            background-color: #4338ca; /* Darker indigo on hover */
+        }
+        .file-input-button svg {
+            margin-right: 0.5rem;
+        }
+
+        /* Hide the canvas, it's only used for processing */
+        canvas {
+            display: none;
+        }
+        /* Removed ad-placeholder styling as it will be replaced by AdSense code */
+        .download-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem; /* Space between download links */
+            margin-top: 1rem;
+        }
+        .download-list a {
+            justify-content: center; /* Center content in links */
+        }
+
+        /* Header specific styles */
+        header {
+            background-color: #1a202c; /* Dark charcoal */
+            color: white;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+        }
+        header .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+            margin-right: 1rem; /* Space between logo and nav */
+        }
+        header nav ul {
+            display: flex;
+            gap: 1.5rem;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-wrap: wrap; /* Allow menu items to wrap */
+            justify-content: center; /* Center items if they wrap */
+        }
+        header nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        header nav ul li a:hover {
+            color: #a78bfa; /* Light purple on hover */
+        }
+        /* Responsive adjustments for header */
+        @media (max-width: 640px) {
+            header {
+                flex-direction: column;
+                padding: 1rem;
+            }
+            header .logo {
+                margin-bottom: 1rem;
+                margin-right: 0;
+            }
+            header nav ul {
+                width: 100%;
+                justify-content: space-around; /* Distribute items evenly */
+                gap: 0.75rem; /* Reduce gap on small screens */
+            }
+        }
+
+        /* Footer specific styles */
+        footer {
+            background-color: #1a202c; /* Dark charcoal */
+            color: #cbd5e0; /* Light gray text */
+            padding: 1.5rem;
+            text-align: center;
+            font-size: 0.875rem;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+        }
+        footer .footer-links ul {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            list-style: none;
+            padding: 0;
+            margin-bottom: 1rem;
+            flex-wrap: wrap; /* Allow wrapping */
+        }
+        footer .footer-links ul li a {
+            color: #cbd5e0;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        footer .footer-links ul li a:hover {
+            color: #a78bfa; /* Light purple on hover */
+        }
+        footer .copyright {
+            margin-top: 0.5rem;
+            color: #94a3b8; /* Slightly darker gray for copyright */
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <header>
+        <a href="https://myscrpts.com" class="logo">myscrpts.com</a>
+        <nav>
+            <ul>
+                <li><a href="https://myscrpts.com">Home</a></li>
+                <li><a href="https://myscrpts.com/about">About</a></li>
+                <li><a href="https://myscrpts.com/contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="main-content-wrapper">
+        <div class="container">
+            <h1 class="text-3xl font-extrabold text-gray-900 mb-3">Image Converter</h1>
+            <p class="text-sm text-gray-600 mb-8">
+                <span class="font-semibold text-indigo-700">Privacy Note:</span> All image processing happens directly in your browser. We do not save any images on our servers.
+            </p>
+
+            <p class="text-gray-600 mb-8">Convert and optimize JPG, PNG, WebP images for web use.</p>
+
+            <div class="mb-6">
+                <label for="imageInput" class="block text-left text-sm font-medium text-gray-700 mb-2">Select one or more image files:</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="imageInput" accept="image/jpeg, image/png, image/webp" multiple>
+                    <div class="file-input-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                        </svg>
+                        <span id="fileName">Choose Files</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <label for="outputFormat" class="block text-left text-sm font-medium text-gray-700 mb-2">Convert to:</label>
+                <select id="outputFormat" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm">
+                    <option value="image/png">PNG (Lossless)</option>
+                    <option value="image/jpeg">JPG (Optimized)</option>
+                    <option value="image/webp">WebP (Optimized)</option>
+                </select>
+            </div>
+
+            <div class="mb-6" id="qualitySliderContainer">
+                <label for="qualitySlider" class="block text-left text-sm font-medium text-gray-700 mb-2">
+                    Output Quality: <span id="qualityValue">85</span>%
+                    <span class="text-xs text-gray-500">(Applies to JPG and WebP for file size reduction)</span>
+                </label>
+                <input type="range" id="qualitySlider" min="1" max="100" value="85" step="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg">
+            </div>
+
+            <button id="convertBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-xl transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 shadow-lg mb-6" disabled>
+                Convert & Optimize
+            </button>
+
+            <div id="message" class="text-sm text-gray-600 mt-4"></div>
+            <div id="outputArea" class="mt-6 hidden">
+                <h3 class="text-lg font-semibold text-gray-800 mb-3">Converted Images:</h3>
+                <p class="text-sm text-gray-600 mb-4">Your images have been processed and are ready for download. No preview is displayed for privacy.</p>
+                <div id="downloadLinksContainer" class="download-list">
+                    </div>
+            </div>
+
+            <canvas id="imageCanvas"></canvas>
+
+            <div class="mt-8">
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-9704521076577901"
+                     data-ad-slot="9078446845"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                     (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-links">
+            <ul>
+                <li><a href="https://myscrpts.com">Home</a></li>
+                <li><a href="https://myscrpts.com/privacy-policy">Privacy Policy</a></li>
+                <li><a href="https://myscrpts.com/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </div>
+        <div class="copyright">
+            &copy; <span id="currentYear"></span> myscrpts.com. All rights reserved.
+        </div>
+    </footer>
+
+    <script>
+        // Get references to DOM elements
+        const imageInput = document.getElementById('imageInput');
+        const fileNameSpan = document.getElementById('fileName');
+        const outputFormatSelect = document.getElementById('outputFormat');
+        const qualitySliderContainer = document.getElementById('qualitySliderContainer');
+        const qualitySlider = document.getElementById('qualitySlider');
+        const qualityValueSpan = document.getElementById('qualityValue');
+        const convertBtn = document.getElementById('convertBtn');
+        const messageDiv = document.getElementById('message');
+        const outputArea = document.getElementById('outputArea');
+        const downloadLinksContainer = document.getElementById('downloadLinksContainer');
+        const imageCanvas = document.getElementById('imageCanvas');
+        const ctx = imageCanvas.getContext('2d');
+        const currentYearSpan = document.getElementById('currentYear'); // New: Reference to the year span
+
+        let selectedFiles = []; // To store multiple file objects
+        const MAX_OPTIMAL_DIMENSION = 1920; // Max dimension for automatic resizing (longest side)
+
+        // Initialize current year in footer
+        currentYearSpan.textContent = new Date().getFullYear();
+
+        // Initialize quality slider display
+        qualityValueSpan.textContent = qualitySlider.value;
+
+        // Event listener for file input change
+        imageInput.addEventListener('change', (event) => {
+            selectedFiles = Array.from(event.target.files); // Convert FileList to Array
+            if (selectedFiles.length > 0) {
+                fileNameSpan.textContent = `${selectedFiles.length} file(s) selected`;
+                convertBtn.disabled = false; // Enable convert button
+                messageDiv.textContent = `${selectedFiles.length} file(s) selected.`;
+                outputArea.classList.add('hidden'); // Hide previous output
+                downloadLinksContainer.innerHTML = ''; // Clear previous download links
+            } else {
+                fileNameSpan.textContent = 'Choose Files';
+                convertBtn.disabled = true; // Disable convert button if no file
+                messageDiv.textContent = '';
+            }
+        });
+
+        // Event listener for output format change to show/hide quality slider
+        outputFormatSelect.addEventListener('change', () => {
+            const selectedFormat = outputFormatSelect.value;
+            if (selectedFormat === 'image/jpeg' || selectedFormat === 'image/webp') {
+                qualitySliderContainer.classList.remove('hidden');
+            } else {
+                qualitySliderContainer.classList.add('hidden');
+            }
+        });
+
+        // Event listener for quality slider change
+        qualitySlider.addEventListener('input', () => {
+            qualityValueSpan.textContent = qualitySlider.value;
+        });
+
+        // Function to process a single image
+        const processImage = (file, index, totalFiles) => {
+            return new Promise((resolve, reject) => {
+                messageDiv.textContent = `Processing image ${index + 1} of ${totalFiles}: ${file.name}...`;
+                const reader = new FileReader();
+
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        let newWidth = img.width;
+                        let newHeight = img.height;
+
+                        // Automatic resizing for "TinyPNG-like" optimization
+                        // If the image is larger than the optimal dimension, resize it
+                        if (img.width > MAX_OPTIMAL_DIMENSION || img.height > MAX_OPTIMAL_DIMENSION) {
+                            const aspectRatio = img.width / img.height;
+                            if (img.width > img.height) {
+                                newWidth = MAX_OPTIMAL_DIMENSION;
+                                newHeight = MAX_OPTIMAL_DIMENSION / aspectRatio;
+                            } else {
+                                newHeight = MAX_OPTIMAL_DIMENSION;
+                                newWidth = MAX_OPTIMAL_DIMENSION * aspectRatio;
+                            }
+                            // Ensure dimensions are at least 1px to avoid errors and round
+                            newWidth = Math.max(1, Math.round(newWidth));
+                            newHeight = Math.max(1, Math.round(newHeight));
+                        }
+
+                        // Set canvas dimensions to the new (or original) dimensions
+                        imageCanvas.width = newWidth;
+                        imageCanvas.height = newHeight;
+
+                        // Draw the image onto the canvas, scaled if resized
+                        ctx.clearRect(0, 0, imageCanvas.width, imageCanvas.height); // Clear canvas before drawing
+                        ctx.drawImage(img, 0, 0, newWidth, newHeight);
+
+                        const outputFormat = outputFormatSelect.value;
+                        const quality = parseFloat(qualitySlider.value) / 100; // Get quality as a float between 0 and 1
+                        let convertedDataUrl;
+                        let fileExtension;
+
+                        try {
+                            // Convert canvas content to the desired format
+                            if (outputFormat === 'image/jpeg') {
+                                convertedDataUrl = imageCanvas.toDataURL(outputFormat, quality);
+                                fileExtension = 'jpg';
+                            } else if (outputFormat === 'image/webp') {
+                                convertedDataUrl = imageCanvas.toDataURL(outputFormat, quality);
+                                fileExtension = 'webp';
+                            } else {
+                                // PNG is lossless, quality parameter is ignored for PNG
+                                convertedDataUrl = imageCanvas.toDataURL(outputFormat);
+                                fileExtension = 'png';
+                            }
+
+                            // Clear canvas after getting data URL to ensure no residual image data
+                            ctx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
+                            imageCanvas.width = 0; // Reset canvas dimensions
+                            imageCanvas.height = 0; // Reset canvas dimensions
+
+                            // Generate dynamic filename (YYYYMMDD_HHMMSS_RANDOM_originalfilename.ext)
+                            const now = new Date();
+                            const year = now.getFullYear();
+                            const month = String(now.getMonth() + 1).padStart(2, '0');
+                            const day = String(now.getDate()).padStart(2, '0');
+                            const hours = String(now.getHours()).padStart(2, '0');
+                            const minutes = String(now.getMinutes()).padStart(2, '0');
+                            const seconds = String(now.getSeconds()).padStart(2, '0');
+                            const randomNumber = Math.floor(Math.random() * 9000) + 1000; // 4-digit random number
+                            const originalFileNameWithoutExt = file.name.split('.').slice(0, -1).join('.');
+                            const filename = `${year}${month}${day}_${hours}${minutes}${seconds}_${randomNumber}_${originalFileNameWithoutExt}.${fileExtension}`;
+
+                            resolve({ dataUrl: convertedDataUrl, filename: filename, originalName: file.name });
+
+                        } catch (error) {
+                            reject(`Error during conversion of ${file.name}: ${error.message}`);
+                        }
+                    };
+                    img.onerror = () => {
+                        reject(`Could not load image ${file.name}. Please ensure it is a valid image file.`);
+                    };
+                    img.src = e.target.result; // Set image source to the read file data
+                };
+
+                reader.onerror = () => {
+                    reject(`Error reading file ${file.name}. Please try again.`);
+                };
+
+                reader.readAsDataURL(file); // Read the file as a Data URL
+            });
+        };
+
+        // Event listener for convert button click
+        convertBtn.addEventListener('click', async () => {
+            if (selectedFiles.length === 0) {
+                messageDiv.textContent = 'Please select one or more images first.';
+                return;
+            }
+
+            messageDiv.textContent = 'Starting conversion...';
+            outputArea.classList.add('hidden'); // Hide previous output
+            downloadLinksContainer.innerHTML = ''; // Clear previous download links
+            convertBtn.disabled = true; // Disable button during conversion
+
+            const convertedResults = [];
+            let conversionErrors = [];
+
+            for (let i = 0; i < selectedFiles.length; i++) {
+                try {
+                    const result = await processImage(selectedFiles[i], i, selectedFiles.length);
+                    convertedResults.push(result);
+                } catch (error) {
+                    conversionErrors.push(error);
+                    console.error(error);
+                }
+            }
+
+            // Use a short timeout to ensure DOM updates are processed before showing results
+            setTimeout(() => {
+                if (convertedResults.length > 0) {
+                    messageDiv.textContent = 'All conversions complete! Your optimized images are ready for download below.';
+                    outputArea.classList.remove('hidden'); // Show output area
+
+                    convertedResults.forEach(item => {
+                        const downloadLinkElement = document.createElement('a');
+                        downloadLinkElement.href = item.dataUrl;
+                        downloadLinkElement.download = item.filename;
+                        downloadLinkElement.textContent = `Download ${item.originalName} (${item.filename.split('.').pop().toUpperCase()})`; // More descriptive text
+                        downloadLinkElement.className = 'inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out';
+                        downloadLinkElement.target = "_blank"; // Open in new tab to prevent navigation
+
+                        // Add SVG icon to the download link
+                        const svgIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                        svgIcon.setAttribute("class", "h-5 w-5 mr-2");
+                        svgIcon.setAttribute("fill", "none");
+                        svgIcon.setAttribute("viewBox", "0 0 24 24");
+                        svgIcon.setAttribute("stroke", "currentColor");
+                        svgIcon.setAttribute("stroke-width", "2");
+                        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                        path.setAttribute("stroke-linecap", "round");
+                        path.setAttribute("stroke-linejoin", "round");
+                        path.setAttribute("d", "M12 10v6m0 0l3-3m-3 3l-3-3m2.81-13.04A9.96 9.96 0 0112 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12a9.96 9.96 0 012.81-7.04L12 2z");
+                        svgIcon.appendChild(path);
+                        downloadLinkElement.prepend(svgIcon);
+
+                        downloadLinksContainer.appendChild(downloadLinkElement);
+                    });
+                }
+
+                if (conversionErrors.length > 0) {
+                    messageDiv.textContent += ` Some images had errors: ${conversionErrors.join('; ')}`;
+                    messageDiv.classList.add('text-red-600'); // Highlight errors
+                } else if (convertedResults.length === 0 && selectedFiles.length > 0) { // Only if files were selected but none converted
+                    messageDiv.textContent = 'No images were successfully converted due to errors.';
+                } else if (selectedFiles.length === 0) {
+                     messageDiv.textContent = ''; // Clear message if no files were selected at all
+                }
+
+                convertBtn.disabled = false; // Re-enable button
+            }, 100); // Small delay
+        });
+
+        // Initially hide quality slider
+        outputFormatSelect.dispatchEvent(new Event('change'));
+    </script>
+</body>
+</html>
